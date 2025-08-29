@@ -5,11 +5,13 @@
 #include <fstream>
 #include "Cipher.hpp"
 
-int main(int argc, char *argv[])
+#define TESTE 1
+
+void test_aes256(int argc, char *argv[])
 {
     if (argc < 2) {
-        std::cerr << "Uso correto: aes-teste <arquivo.txt>\n";
-        return 1;
+        std::cerr << "Uso correto: teste <arquivo.txt>\n";
+        return;
     }
 
     const char *input_path = argv[1];
@@ -20,7 +22,7 @@ int main(int argc, char *argv[])
         std::ifstream fin(input_path, std::ios::binary);
         if (!fin) {
             std::cerr << "Erro ao abrir arquivo " << input_path << "\n";
-            return 1;
+            return;
         }
 
         fin.seekg(0, std::ios::end);
@@ -29,15 +31,15 @@ int main(int argc, char *argv[])
 
         if (size <= 0) {
             std::cerr << "Arquivo vazio ou erro ao medir o tamanho.\n";
-            return 1;
+            return;
         }
 
         plaintext.resize(size);
         if (!fin.read(reinterpret_cast<char*>(plaintext.data()), size)) {
             std::cerr << "Erro ao ler o arquivo.\n";
-            return 1;
+            return;
         }
-    }    
+    }
 
     // chave de 256 bits
     const unsigned char key[32] = { 
@@ -69,7 +71,7 @@ int main(int argc, char *argv[])
         std::ofstream fout(enc_path, std::ios::binary);
         if (!fout) {
             std::cerr << "Erro ao criar arquivo de saída: " << enc_path << "\n";
-            return 1;
+            return;
         }
         if (!ciphertext.empty()) {
             fout.write(reinterpret_cast<const char*>(ciphertext.data()),
@@ -77,7 +79,7 @@ int main(int argc, char *argv[])
         }
         if (!fout.good()) {
             std::cerr << "Erro ao escrever no arquivo: " << enc_path << "\n";
-            return 1;
+            return;
         }
     }
     // escreve dados decifrados no arq
@@ -85,7 +87,7 @@ int main(int argc, char *argv[])
         std::ofstream fout(dec_path, std::ios::binary);
         if (!fout) {
             std::cerr << "Erro ao criar arquivo de saída: " << dec_path << "\n";
-            return 1;
+            return;
         }
         if (!decryptedtext.empty()) {
             fout.write(reinterpret_cast<const char*>(decryptedtext.data()),
@@ -93,13 +95,27 @@ int main(int argc, char *argv[])
         }
         if (!fout.good()) {
             std::cerr << "Erro ao escrever no arquivo: " << dec_path << "\n";
-            return 1;
+            return;
         }
     }
 
     // info extra
     std::cout << "Tamanho do plaintext: " << plaintext.size() << " bytes\n";
     std::cout << "Tamanho do ciphertext: " << ciphertext.size() << " bytes\n";
+}
+
+void test_transposition()
+{
+
+}
+
+int main(int argc, char *argv[])
+{
+    #if TESTE == 1 // aes256
+        test_aes256(argc, argv);
+    #elif TESTE == 2 // transposicao
+        test_transposition();
+    #endif
 
     return 0;
 }
